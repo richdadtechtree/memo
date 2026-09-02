@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>MyReader</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<link id="hljs-light-theme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+<link id="hljs-dark-theme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" disabled>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app">
+  <header id="app-header">
+    <h1>📖 MyReader</h1>
+    <button id="logout-btn" class="icon-btn" hidden title="로그아웃">🔒</button>
+  </header>
+
+  <section id="view-login">
+    <div class="login-box">
+      <input type="password" id="password-input" placeholder="비밀번호" autocomplete="current-password">
+      <button id="login-btn">입장</button>
+      <p id="login-error" class="error-text" hidden></p>
+    </div>
+  </section>
+
+  <section id="view-list" hidden>
+    <div class="input-area">
+      <textarea id="text-input" placeholder="텍스트를 붙여넣으세요..."></textarea>
+      <button id="save-btn">저장하기</button>
+    </div>
+
+    <div class="search-area">
+      <input type="text" id="search-input" placeholder="🔍 검색...">
+    </div>
+
+    <ul id="item-list"></ul>
+  </section>
+
+  <section id="view-reader" hidden>
+    <div class="reader-header">
+      <div class="reader-header-top">
+        <button id="back-btn">← 뒤로</button>
+        <button id="reader-delete-btn" class="icon-btn" title="삭제">🗑️</button>
+      </div>
+      <h2 id="reader-title"></h2>
+      <div class="font-size-control">
+        <button id="font-decrease" class="icon-btn small" title="글자 작게">가-</button>
+        <span id="font-size-label">16px</span>
+        <button id="font-increase" class="icon-btn small" title="글자 크게">가+</button>
+      </div>
+    </div>
+    <div id="reader-content" class="reader-content"></div>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
