@@ -3,7 +3,8 @@ const express = require('express');
 const crypto = require('crypto');
 const path = require('path');
 const { readItems, writeItems } = require('./lib/store');
-const { formatText } = require('./lib/formatter');
+const { formatText, escapeHtml } = require('./lib/formatter');
+const { captureScreenshot } = require('./lib/screenshot');
 
 const PORT = process.env.PORT || 3000;
 const PASSWORD = process.env.PASSWORD;
@@ -94,6 +95,47 @@ app.post('/api/submit', (req, res) => {
   });
 });
 
+// --- API: 웹페이지 URL 캡처 (예: 스레드 게시물) ---
+app.post('/api/capture', async (req, res) => {
+  const { url, title } = req.body || {};
+  if (!url || !url.trim()) {
+    return res.status(400).json({ error: 'url이 비어있습니다.' });
+  }
+
+  let captured;
+  try {
+    captured = await captureScreenshot(url.trim());
+  } catch (err) {
+    return res.status(400).json({ error: err.message || '캡처에 실패했습니다.' });
+  }
+
+  const targetUrl = url.trim();
+  const pageTitle = captured.pageTitle;
+  const dataUri = `data:image/jpeg;base64,${captured.buffer.toString('base64')}`;
+  const formattedHtml = `<div class="screenshot-embed"><a href="${escapeHtml(targetUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(targetUrl)}</a><img src="${dataUri}" alt="${escapeHtml(pageTitle || targetUrl)}"></div>`;
+
+  const items = readItems();
+  const newItem = {
+    id: crypto.randomUUID(),
+    title: (title && title.trim()) || pageTitle || targetUrl,
+    content: targetUrl,
+    formattedHtml,
+    type: 'screenshot',
+    preview: pageTitle || targetUrl,
+    createdAt: new Date().toISOString(),
+  };
+
+  items.unshift(newItem);
+  writeItems(items);
+
+  res.json({
+    id: newItem.id,
+    title: newItem.title,
+    preview: newItem.preview,
+    createdAt: newItem.createdAt,
+  });
+});
+
 // --- API: 목록 조회 ---
 app.get('/api/items', (req, res) => {
   const { search } = req.query;
@@ -110,7 +152,7 @@ app.get('/api/items', (req, res) => {
 
   const list = items
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-    .map(({ id, title, preview, createdAt }) => ({ id, title, preview, createdAt }));
+    .map(({ id, title, preview, createdAt, type }) => ({ id, title, preview, createdAt, type }));
 
   res.json(list);
 });

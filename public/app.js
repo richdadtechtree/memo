@@ -18,6 +18,9 @@ const loginError = $('#login-error');
 const viewList = $('#view-list');
 const textInput = $('#text-input');
 const saveBtn = $('#save-btn');
+const captureUrlInput = $('#capture-url-input');
+const captureBtn = $('#capture-btn');
+const captureStatus = $('#capture-status');
 const searchInput = $('#search-input');
 const itemList = $('#item-list');
 
@@ -156,7 +159,7 @@ function renderList(items) {
 
     const title = document.createElement('div');
     title.className = 'item-title';
-    title.textContent = item.title;
+    title.textContent = item.type === 'screenshot' ? `🔗 ${item.title}` : item.title;
 
     const date = document.createElement('div');
     date.className = 'item-date';
@@ -223,6 +226,48 @@ async function saveText() {
     saveBtn.disabled = false;
   }
 }
+
+// --- URL 캡처 ---
+async function captureUrl() {
+  const url = captureUrlInput.value.trim();
+  if (!url) return;
+
+  captureBtn.disabled = true;
+  captureUrlInput.disabled = true;
+  captureStatus.hidden = false;
+  captureStatus.classList.remove('error');
+  captureStatus.textContent = '캡처 중... (몇 초 걸릴 수 있어요)';
+
+  try {
+    const res = await fetch(`${API}/capture`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      body: JSON.stringify({ url }),
+    });
+
+    if (res.status === 401) return handleUnauthorized();
+
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || '캡처에 실패했습니다.');
+    }
+
+    captureUrlInput.value = '';
+    captureStatus.hidden = true;
+    await loadItems(searchInput.value);
+  } catch (err) {
+    captureStatus.textContent = err.message;
+    captureStatus.classList.add('error');
+  } finally {
+    captureBtn.disabled = false;
+    captureUrlInput.disabled = false;
+  }
+}
+
+captureBtn.addEventListener('click', captureUrl);
+captureUrlInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') captureUrl();
+});
 
 // --- 읽기 뷰 ---
 async function openItem(id) {
