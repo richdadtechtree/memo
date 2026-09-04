@@ -215,6 +215,10 @@ async function clearAllItems() {
   });
 
   if (res.status === 401) return handleUnauthorized();
+  if (!res.ok) {
+    alert('삭제에 실패했습니다. 서버 상태를 확인해주세요.');
+    return;
+  }
 
   loadItems(searchInput.value);
 }
