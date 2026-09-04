@@ -115,17 +115,21 @@ app.post('/api/capture', async (req, res) => {
   const firstLine = (caption || '').split('\n').find((line) => line.trim()) || '';
   const shortTitle = (title && title.trim()) || firstLine.trim().slice(0, 40) || pageTitle || targetUrl;
 
-  const captionHtml = caption
-    ? caption
-        .split(/\n{2,}/)
-        .map((p) => p.trim())
-        .filter(Boolean)
-        .map((p) => `<p>${escapeHtml(p).replace(/\n/g, '<br>')}</p>`)
-        .join('\n')
-    : '';
+  const textBlockToHtml = (text) =>
+    text
+      .split(/\n{2,}/)
+      .map((p) => p.trim())
+      .filter(Boolean)
+      .map((p) => `<p>${escapeHtml(p).replace(/\n/g, '<br>')}</p>`)
+      .join('\n');
+
+  const captionHtml = caption ? textBlockToHtml(caption) : '';
+  const repliesHtml = (captured.authorReplies || [])
+    .map((reply) => `<div class="author-reply">${textBlockToHtml(reply)}</div>`)
+    .join('\n');
 
   const dataUri = `data:image/jpeg;base64,${captured.buffer.toString('base64')}`;
-  const formattedHtml = `${captionHtml}<div class="screenshot-embed"><a href="${escapeHtml(targetUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(targetUrl)}</a><img src="${dataUri}" alt="${escapeHtml(pageTitle || targetUrl)}"></div>`;
+  const formattedHtml = `${captionHtml}${repliesHtml}<div class="screenshot-embed"><a href="${escapeHtml(targetUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(targetUrl)}</a><img src="${dataUri}" alt="${escapeHtml(pageTitle || targetUrl)}"></div>`;
 
   const items = readItems();
   const newItem = {

@@ -211,6 +211,18 @@ body {
   color: var(--danger);
 }
 
+/* --- 작성자 본인이 이어서 단 댓글 --- */
+.author-reply {
+  margin: 1em 0;
+  padding-left: 14px;
+  border-left: 2px solid var(--border);
+  color: var(--fg-muted);
+}
+
+.author-reply p:last-child {
+  margin-bottom: 0;
+}
+
 /* --- 캡처된 웹페이지 --- */
 .screenshot-embed {
   display: flex;
