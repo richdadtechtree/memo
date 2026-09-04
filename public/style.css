@@ -244,17 +244,30 @@ body {
 }
 
 .search-area {
+  display: flex;
+  gap: 8px;
   margin-bottom: 12px;
 }
 
 #search-input {
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   padding: 10px 12px;
   font-size: 15px;
   background: var(--input-bg);
   color: var(--fg);
   border: 1px solid var(--border);
   border-radius: 10px;
+}
+
+.text-btn {
+  background: none;
+  border: none;
+  color: var(--danger);
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  padding: 0 4px;
 }
 
 /* --- 목록 --- */

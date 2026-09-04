@@ -174,6 +174,12 @@ app.get('/api/items', (req, res) => {
   res.json(list);
 });
 
+// --- API: 전체 삭제 ---
+app.delete('/api/items', (req, res) => {
+  writeItems([]);
+  res.json({ ok: true });
+});
+
 // --- API: 개별 조회 ---
 app.get('/api/items/:id', (req, res) => {
   const items = readItems();

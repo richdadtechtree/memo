@@ -22,6 +22,7 @@ const captureUrlInput = $('#capture-url-input');
 const captureBtn = $('#capture-btn');
 const captureStatus = $('#capture-status');
 const searchInput = $('#search-input');
+const clearAllBtn = $('#clear-all-btn');
 const itemList = $('#item-list');
 
 const viewReader = $('#view-reader');
@@ -204,6 +205,21 @@ async function deleteItem(id) {
 
   loadItems(searchInput.value);
 }
+
+async function clearAllItems() {
+  if (!confirm('저장된 글을 전부 삭제하시겠습니까? 되돌릴 수 없습니다.')) return;
+
+  const res = await fetch(`${API}/items`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  });
+
+  if (res.status === 401) return handleUnauthorized();
+
+  loadItems(searchInput.value);
+}
+
+clearAllBtn.addEventListener('click', clearAllItems);
 
 // --- 저장 ---
 async function saveText() {
